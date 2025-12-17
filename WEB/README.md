@@ -1,5 +1,5 @@
 # UMAP2UEFN WEB
-UMAP2UEFN WEB is a local, HTML based UMAP converter.
+UMAP2UEFN WEB is an online, HTML based UMAP converter.
 
 Instructions:
   1. Open the UMAP2UEFN WEB Git-Hub Page.
