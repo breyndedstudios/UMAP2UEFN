@@ -1,4 +1,4 @@
-#UMAP2UEFN WEB
+# UMAP2UEFN WEB
 UMAP2UEFN WEB is a local, HTML based UMAP converter.
 
 Instructions:
