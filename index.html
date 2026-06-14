@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMAP2UEFN WEB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Google Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-variation-settings: "GRAD" 0;
+            background-image: url(https://fnggcdn.com/assets/MVKd2I.png);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50px;
+            backdrop-filter: blur(50px);
+            box-shadow: 0px 5px 15px rgba(255, 255, 255, 0.25) inset, -5px 0px 15px rgba(128, 128, 128, 0.25) inset, 5px 0px 15px rgba(128, 128, 128, 0.25) inset, 0px -5px 15px rgba(0,0,0,0.25) inset;
+        }
+        
+        .header {
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 15px 30px;
+        }
+        
+        .upload-box {
+            width: 100%;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50px;
+            backdrop-filter: blur(20px);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+			text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        .upload-box:hover {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0px 0px 15px rgba(0,0,0,0) inset;
+        }
+        
+        .upload-box.active {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .upload-box label {
+            display: block;
+            cursor: pointer;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .upload-box input[type="file"] {
+            display: none;
+        }
+        
+        .file-info {
+            font-size: 14px;
+			text-align: center;
+            color: white;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50px;
+            backdrop-filter: blur(20px);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.25);
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: rgba(128, 128, 128, 0.15);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .output-section {
+            display: none;
+        }
+        
+        .output-section.visible {
+            display: block;
+        }
+        
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .output-header h2 {
+            color: white;
+            font-size: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .copy-btn, .download-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50px;
+            backdrop-filter: blur(20px);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .download-btn {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .download-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .copy-btn.copied {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .output-box {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            padding: 30px 30px;
+            font-family: "Google Sans Code", monospace;
+			font-optical-sizing: auto;
+			font-weight: 500;
+			font-style: normal;
+            font-size: 13px;
+            line-height: 1.6;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .status {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status.visible {
+            display: block;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef5350;
+			border-radius: 50px;
+        }
+        
+        .status.success {
+			display: none;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #66bb6a;
+			border-radius: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>UMAP2UEFN</h1>
+            <p>Upload Your UMAP/JSON/TXT File To Convert It To UEFN Format</p>
+        </div>
+        
+        <div class="content">
+            <div class="upload-box" id="uploadBox">
+                <label for="fileInput">Upload UMAP/JSON/TXT File</label>
+                <input type="file" id="fileInput" accept=".umap,.json,.txt">
+                <div class="file-info" id="fileInfo">No File Selected</div>
+            </div>
+            
+            <button class="btn" id="convertBtn" disabled>Convert to UE Text Format</button>
+            
+            <div class="status" id="status"></div>
+            
+            <div class="output-section" id="outputSection">
+                <div class="output-header">
+                    <h2 id="outputTitle">Converted Output ()</h2>
+                    <div class="action-buttons">
+                        <button class="copy-btn" id="copyBtn">Copy Output</button>
+                        <button class="download-btn" id="downloadBtn">Download TXT</button>
+                    </div>
+                </div>
+                <div class="output-box" id="outputBox"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let jsonData = null;
+        let fileName = '';
+        let convertedOutput = '';
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadBox = document.getElementById('uploadBox');
+        const fileInfo = document.getElementById('fileInfo');
+        const convertBtn = document.getElementById('convertBtn');
+        const outputSection = document.getElementById('outputSection');
+        const outputBox = document.getElementById('outputBox');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const status = document.getElementById('status');
+		const outputTitle = document.getElementById('outputTitle');
+
+
+        uploadBox.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', handleFileUpload);
+
+        convertBtn.addEventListener('click', handleConvert);
+
+        copyBtn.addEventListener('click', handleCopy);
+
+        downloadBtn.addEventListener('click', handleDownload);
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            fileName = file.name.replace(/\.(json|txt)$/i, '');
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+                try {
+                    jsonData = JSON.parse(event.target.result);
+                    uploadBox.classList.add('active');
+                    fileInfo.textContent = file.name;
+                    convertBtn.disabled = false;
+                    showStatus('File loaded successfully!', 'success');
+                } catch (error) {
+                    showStatus('Error: Invalid JSON file format', 'error');
+                    resetUpload();
+                }
+            };
+
+            reader.onerror = () => {
+                showStatus('Error: Failed to read file', 'error');
+                resetUpload();
+            };
+
+            reader.readAsText(file);
+        }
+
+        function handleConvert() {
+    if (!jsonData) return;
+
+    try {
+        convertedOutput = convertToUnrealFormat(jsonData, fileName);
+        outputBox.textContent = convertedOutput;
+
+        // ✅ update header with active filename
+        outputTitle.textContent = `Converted Output (${fileName})`;
+
+        outputSection.classList.add('visible');
+        showStatus('Conversion successful!', 'success');
+    } catch (error) {
+        showStatus('Error during conversion: ' + error.message, 'error');
+    }
+}
+
+
+        function handleCopy() {
+            navigator.clipboard.writeText(convertedOutput).then(() => {
+                copyBtn.textContent = '✓ Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy Output';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                showStatus('Error: Failed to copy to clipboard', 'error');
+            });
+        }
+
+        function handleDownload() {
+            const blob = new Blob([convertedOutput], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${fileName}_converted.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function resetUpload() {
+            jsonData = null;
+            fileName = '';
+            uploadBox.classList.remove('active');
+            fileInfo.textContent = 'No file selected';
+            convertBtn.disabled = true;
+            fileInput.value = '';
+        }
+
+        function showStatus(message, type) {
+            status.textContent = message;
+            status.className = `status visible ${type}`;
+            setTimeout(() => status.classList.remove('visible'), 5000);
+        }
+
+        function convertToUnrealFormat(data, folderName) {
+            const actors = data.filter(obj => 
+                obj.Type && 
+                obj.Name && 
+                obj.Outer === 'PersistentLevel' && 
+                obj.Type.endsWith('_C')
+            );
+
+            let output = 'Begin Map\n    Begin Level\n\n';
+
+            actors.forEach(actor => {
+                const classPath = extractClassPath(actor.Class);
+                const meshComp = findComponent(data, actor, 'StaticMeshComponent');
+                
+                output += `        Begin Actor Class="${classPath}"\n`;
+                
+                if (meshComp) {
+                    output += '            Begin Object Name="StaticMeshComponent0"\n';
+                    output += formatLocation(meshComp.Properties?.RelativeLocation);
+                    output += formatRotation(meshComp.Properties?.RelativeRotation);
+                    output += formatScale(meshComp.Properties?.RelativeScale3D);
+                    output += '            End Object\n';
+                }
+                
+                output += formatTextureData(actor.Properties?.TextureData);
+                output += '            bAllowCustomMaterial=False\n';
+                output += '            End Object\n';
+                output += `            ActorLabel="${actor.Name}"\n`;
+                output += `            FolderPath="${folderName}"\n`;
+                output += '        End Actor\n\n';
+            });
+
+            output += '    End Level\n\n';
+            output += 'Begin Surface\n';
+            output += 'End Surface\n';
+            output += 'End Map\n';
+
+            return output;
+        }
+
+        function extractClassPath(classStr) {
+            const match = classStr.match(/FortniteGame\/Content\/(.*?)'/);
+            return match ? `/Game/${match[1]}` : '';
+        }
+
+        function extractTexturePath(textureData) {
+            if (!textureData?.ObjectPath) return null;
+
+            let path = textureData.ObjectPath
+                .replace('FortniteGame/Content/', '/Game/')
+                .replace('/Diffuses/', '/')
+                .replace(/\.\d+$/, '');
+            
+            const parts = path.split('/');
+            const filename = parts[parts.length - 1];
+            
+            return `${path}.${filename}`;
+        }
+
+        function findComponent(data, actor, componentType) {
+            return data.find(obj => 
+                obj.Type === componentType && 
+                obj.Name === 'StaticMeshComponent0' && 
+                obj.Outer === actor.Name
+            );
+        }
+
+        function formatNumber(num) {
+            if (num === undefined || num === null) return '0';
+            if (Number.isInteger(num)) return num.toString();
+            return num.toString().includes('e') ? num.toExponential() : num.toString();
+        }
+
+        function formatLocation(loc) {
+            if (!loc) return '';
+            return `                RelativeLocation=(X=${formatNumber(loc.X)},Y=${formatNumber(loc.Y)},Z=${formatNumber(loc.Z)})\n`;
+        }
+
+        function formatRotation(rot) {
+            if (!rot) return '';
+            return `                RelativeRotation=(Pitch=${formatNumber(rot.Pitch)},Yaw=${formatNumber(rot.Yaw)},Roll=${formatNumber(rot.Roll)})\n`;
+        }
+
+        function formatScale(scale) {
+            if (!scale) return '';
+            return `                RelativeScale3D=(X=${formatNumber(scale.X)},Y=${formatNumber(scale.Y)},Z=${formatNumber(scale.Z)})\n`;
+        }
+
+        function formatTextureData(textureData) {
+            if (!textureData) return '';
+            
+            const path = extractTexturePath(textureData);
+            if (!path) return '';
+            
+            const textureLine = `/Script/FortniteGame.BuildingTextureData'${path}'`;
+            return `            TextureData(0)="${textureLine}"\n            TextureData(1)="${textureLine}"\n`;
+        }
+    </script>
+</body>
+</html>
